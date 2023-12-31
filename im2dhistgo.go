@@ -62,7 +62,7 @@ func Im2dhist(input_layer *image.Gray, w int) [65536]uint32 {
 					v_diff := int(v_2) - int(v_1)
 					if v_diff < 0 {v_diff *= -1}
 
-					v_diff_incremented = uint32(v_diff) + 1
+					v_diff_incremented := uint32(v_diff) + 1
 
 					twodhist[index1] += v_diff_incremented
 					if v_1 == v_2 {
