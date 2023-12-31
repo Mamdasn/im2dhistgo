@@ -84,9 +84,8 @@ func Imhist(img *image.Gray) [256]uint32 {
 	bounds := img.Bounds()
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			g, _, _, _ := img.At(x, y).RGBA()
-			// A color's RGBA method returns values in the range [0, 65535].
-			histogram[g>>8]++
+			v := img.GrayAt(x, y).Y
+			histogram[uint8(v)]++
 		}
 	}
 	return histogram
