@@ -12,7 +12,7 @@ import (
 	"fmt"
 )
 
-func Im2dhist_file(imagename string)  [65536]int {
+func Im2dhist_file(imagename string)  [65536]uint32 {
 	input_image, err := getImageFromFilePath(imagename)
 	if err != nil {
 		fmt.Println(imagename) // debugging
@@ -42,9 +42,9 @@ func Im2dhist_file(imagename string)  [65536]int {
 	return twodhist
 }
 
-func Im2dhist(input_layer *image.Gray, w int) [65536]int {
+func Im2dhist(input_layer *image.Gray, w int) [65536]uint32 {
 	img_bounds := input_layer.Bounds()
-	var twodhist [65536]int
+	var twodhist [65536]uint32
 
 	for x := img_bounds.Min.X; x < img_bounds.Max.X; x++ {
 		for y := img_bounds.Min.Y; y < img_bounds.Max.Y; y++ {
@@ -77,8 +77,8 @@ func Im2dhist(input_layer *image.Gray, w int) [65536]int {
 	return twodhist
 }
 
-func Imhist(img *image.Gray) [256]int {
-	var histogram [256]int
+func Imhist(img *image.Gray) [256]uint32 {
+	var histogram [256]uint32
 	bounds := img.Bounds()
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
