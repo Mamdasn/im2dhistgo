@@ -8,6 +8,7 @@ import (
 	_ "image/png"
 	"math"
 	"os"
+	"sync"
 
 	"fmt"
 )
@@ -77,6 +78,57 @@ func Im2dhist(input_layer *image.Gray, w int) [65536]uint32 {
 	}
 
 	return twodhist
+}
+
+func Im2dhist_parallel(input_layer *image.Gray, w int) [65536]uint32 {
+    img_bounds := input_layer.Bounds()
+    var twodhist [65536]uint32
+    var mutex sync.Mutex
+
+    var wg sync.WaitGroup
+    for x := img_bounds.Min.X; x < img_bounds.Max.X; x++ {
+        wg.Add(1)
+        go func(x int) {
+            defer wg.Done()
+            localHist := [65536]uint32{}
+            for y := img_bounds.Min.Y; y < img_bounds.Max.Y; y++ {
+                v_1 := input_layer.GrayAt(x, y).Y
+                for i := -w; i < w+1; i++ {
+                    for j := -w; j < w+1; j++ {
+                        x_kernel := x + i
+                        y_kernel := y + j
+                        if x_kernel < img_bounds.Min.X || x_kernel >= img_bounds.Max.X || y_kernel < img_bounds.Min.Y || y_kernel >= img_bounds.Max.Y {
+                            continue
+                        }
+                        v_2 := input_layer.GrayAt(x_kernel, y_kernel).Y
+
+                        index1 := uint16(v_1) + uint16(v_2)*256
+                        v_diff := int(v_2) - int(v_1)
+                        if v_diff < 0 {
+                            v_diff *= -1
+                        }
+
+                        v_diff_incremented := uint32(v_diff) + 1
+
+                        localHist[index1] += v_diff_incremented
+                        if v_1 != v_2 {
+                            index2 := uint16(v_2) + uint16(v_1)*256
+                            localHist[index2] += v_diff_incremented
+                        }
+                    }
+                }
+            }
+
+            mutex.Lock()
+            for i, v := range localHist {
+                twodhist[i] += v
+            }
+            mutex.Unlock()
+        }(x)
+    }
+    wg.Wait()
+
+    return twodhist
 }
 
 func Imhist(img *image.Gray) [256]uint32 {
