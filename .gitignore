@@ -19,9 +19,10 @@ main/main
 *.out
 
 # Go mod file
+go.sum
+go.mod
 main/go.mod
 main/go.sum
-*.mod
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
