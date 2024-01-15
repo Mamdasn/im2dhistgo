@@ -1,6 +1,8 @@
+// Package im2dhistgo provides functions for processing images and generating histograms.
 package im2dhistgo
 
 import (
+	// Standard library imports
 	"image"
 	"image/color"
 	_ "image/jpeg"
@@ -9,10 +11,13 @@ import (
 	"math"
 	"os"
 	"sync"
-
 	"fmt"
 )
 
+// Im2dhist_file takes an image file name as input, converts it to grayscale,
+// and returns a 2D histogram of the image.
+// The histogram is represented as a fixed-size array where each element
+// counts occurrences of specific intensity differences.
 func Im2dhist_file(imagename string)  [65536]uint32 {
 	input_image, err := getImageFromFilePath(imagename)
 	if err != nil {
@@ -43,6 +48,9 @@ func Im2dhist_file(imagename string)  [65536]uint32 {
 	return twodhist
 }
 
+// Im2dhist generates a 2D histogram for a given grayscale image.
+// The histogram is calculated based on the intensity differences of pixels
+// within a specified window size.
 func Im2dhist(input_layer *image.Gray, w int) [65536]uint32 {
 	img_bounds := input_layer.Bounds()
 	var twodhist [65536]uint32
@@ -80,6 +88,8 @@ func Im2dhist(input_layer *image.Gray, w int) [65536]uint32 {
 	return twodhist
 }
 
+// Im2dhist_parallel performs a similar operation to Im2dhist but uses
+// parallel processing to speed up the histogram generation.
 func Im2dhist_parallel(input_layer *image.Gray, w int) [65536]uint32 {
     img_bounds := input_layer.Bounds()
     var twodhist [65536]uint32
@@ -131,6 +141,9 @@ func Im2dhist_parallel(input_layer *image.Gray, w int) [65536]uint32 {
     return twodhist
 }
 
+// Imhist generates a standard histogram for a grayscale image.
+// It returns an array where each element represents the count of pixels
+// having a specific intensity value.
 func Imhist(img *image.Gray) [256]uint32 {
 	var histogram [256]uint32
 	bounds := img.Bounds()
@@ -143,10 +156,12 @@ func Imhist(img *image.Gray) [256]uint32 {
 	return histogram
 }
 
+// float2uint8 converts a float64 value in the range [0, 1] to a uint8 value.
 func float2uint8(c float64) uint8 {
 	return uint8(math.Round(c * 255))
 }
 
+// max returns the maximum value in an array of float64.
 func max(arr [256]float64) float64 {
 	maxm := arr[0]
 	for i, _ := range arr {
@@ -157,6 +172,8 @@ func max(arr [256]float64) float64 {
 	return maxm
 }
 
+// getImageFromFilePath opens an image file and decodes it.
+// It returns the decoded image and any error encountered.
 func getImageFromFilePath(filePath string) (image.Image, error) {
 	f, err := os.Open(filePath)
 	if err != nil {
@@ -167,10 +184,12 @@ func getImageFromFilePath(filePath string) (image.Image, error) {
 	return image, err
 }
 
+// HSV represents a color in the Hue, Saturation, and Value (HSV) color space.
 type HSV struct { // {0..1}
 	H, S, V float64
 }
 
+// HSV converts an RGB color to its HSV representation.
 func (c *RGB) HSV() *HSV {
 	r, g, b := c.R, c.G, c.B
 	max := math.Max(r, math.Max(g, b))
@@ -184,7 +203,6 @@ func (c *RGB) HSV() *HSV {
 	if max != 0 {
 		s = delta / max
 	} else {
-		// r = g = b = 0
 		s = 0
 		h = -1 // Undefined
 		return &HSV{H: h, S: s, V: v}
@@ -209,10 +227,12 @@ func (c *RGB) HSV() *HSV {
 	return &HSV{H: h, S: s, V: v}
 }
 
+// RGB represents a color in the Red, Green, and Blue (RGB) color space.
 type RGB struct { // {0..255}
 	R, G, B float64
 }
 
+// RGB converts an HSV color to its RGB representation.
 func (c *HSV) RGB() *RGB {
 	h, s, v := c.H, c.S, c.V
 
