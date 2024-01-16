@@ -3,7 +3,7 @@ name: Publish GoDoc to gh-pages
 on:
   push:
     branches:
-      - main
+      - ignore
 
 jobs:
   deploy-docs:
