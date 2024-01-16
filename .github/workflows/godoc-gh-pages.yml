@@ -25,7 +25,7 @@ jobs:
         run: |
           godoc -http=:6060 &
           sleep 10
-          wget -r -k -p -P docs http://localhost:6060/pkg/im2dhistgo.go
+          wget -r -k -p -P docs http://localhost:6060/
 
       - name: Checkout Documentation Branch
         uses: actions/checkout@v3
